@@ -12,4 +12,4 @@ Plaintext link: https://netlib.org/lapack/explore-html/
 Several routines were changed to facilitate a standalone implementation.
 
 This is intended for reference purposes only, and not meant for production code.
-The only guarantee here is that everything is 0-based, and should be easier to follow if building the same for a different value type or template code.
+The only guarantee here is that everything is 0-based, and should be easier to follow if building -something new- the same for a different value type or template code.
