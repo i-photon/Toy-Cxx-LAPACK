@@ -13,6 +13,7 @@
 #include <cstring>
 #include <utility>
 #include <vector>
+#include <limits>
 
 using std::min;
 using std::max;
@@ -4073,9 +4074,6 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void TestSymmEigensolve()
   {
-    double nan = 0.0;
-    nan /= nan;
-
     double baseErrMax = 1.0e-10;
 
     auto CmpDbl = []( const void *pa, const void *pb ) noexcept -> int
@@ -4112,7 +4110,7 @@ struct Toy_Cxx_LAPACK_3_7_0
     auto DoTest = [&]( const char *title, int n, const double *pA0 )
     {
       std::vector<double> tmp{};
-      tmp.resize( (size_t)(4*(n*n+1) + 5*(n+2) + 2*n), nan );
+      tmp.resize( (size_t)(4*(n*n+1) + 5*(n+2) + 2*n), std::numeric_limits<double>::quiet_NaN() );
 
       double * pA = &tmp.front();
       double * pZ0 = pA + (n*n + 1);
