@@ -15,10 +15,6 @@
 #include <vector>
 #include <limits>
 
-using std::min;
-using std::max;
-using std::isnan;
-
 // Translations with index-space refactoring from Reference-LAPACK.
 // 
 // Refer to the original FORTRAN routines for documentation.
@@ -184,6 +180,8 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlassq( int n, double *x, int incx, double &scale, double &sumsq )
   {
+    using std::isnan;
+
     int ix;
     double absxi;
 
@@ -462,6 +460,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlartg( double f, double g, double &cs, double &sn, double &r )
   {
+    using std::min;
+    using std::max;
+
     int count;
     double f1, g1, safmin, safmax, eps, scale;
 
@@ -545,6 +546,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlaset( HalfOpt uplo, int m, int n, double alpha, double beta, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+
     int i, j;
 
     auto A = [&]( int i, int j ) noexcept -> double &
@@ -585,6 +589,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlasr( SideOpt side, PivotOpt pivot, DirectOpt direct, int m, int n, double *c, double *s, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+
     int i, j;
     double ctmp, stmp, tmp;
 
@@ -923,6 +930,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   int iladlr( int m, int n, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+
     int i, j, row;
 
     auto A = [&]( int i, int j ) noexcept -> double &
@@ -953,6 +963,10 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlascl( TypeOpt type, int kl, int ku, double cfrom, double cto, int m, int n, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+    using std::isnan;
+
     bool done;
     int i, j, k1, k2, k3, k4;
     double bignum, cfrom1, cfromc, cto1, ctoc, mul, smlnum;
@@ -1116,6 +1130,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dsyr2( HalfOpt uplo, int n, double alpha, double *x, int incx, double *y, int incy, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+
     double tmp1, tmp2;
     int i, ix, iy, j, jx, jy, kx, ky;
 
@@ -1239,6 +1256,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dsyr2k( HalfOpt uplo, TransposeOpt trans, int n, int k, double alpha, double *pA, int lda, double *pB, int ldb, double beta, double *pC, int ldc )
   {
+    using std::min;
+    using std::max;
+
     double tmp1, tmp2;
     int i, j, h, nrowa;
 
@@ -1450,6 +1470,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dger( int m, int n, double alpha, double *x, int incx, double *y, int incy, double *pA, int lda )
   {
+    using std::min;
+    using std::max;
+
     double tmp;
     int i, ix, j, jy, kx;
 
@@ -1511,7 +1534,10 @@ struct Toy_Cxx_LAPACK_3_7_0
   //------------------------------------------------------------------------
 
   void dgemv( TransposeOpt trans, int m, int n, double alpha, double *pA, int lda, double *x, int incx, double beta, double *y, int incy )
-  {
+  {  
+    using std::min;
+    using std::max;
+
     double tmp;
     int i, ix, iy, j, jx, jy, kx, ky, lenx, leny;
 
@@ -1666,6 +1692,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   void dgemm( TransposeOpt transa, TransposeOpt transb, int m, int n, int k,
     double alpha, double *pA, int lda, double *pB, int ldb, double beta, double *pC, int ldc )
   {
+    using std::min;
+    using std::max;
+
     double tmp;
     int i, j, h, ncola, nrowa, nrowb;
     bool nota, notb;
@@ -1827,6 +1856,8 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   double dlanst( NormOpt norm, int n, double *d, double *e )
   {
+    using std::isnan;
+
     int i;
     double anorm, scale, sum;
 
@@ -1891,6 +1922,8 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   double dlansy( NormOpt norm, HalfOpt uplo, int n, double *pA, int lda, double *work )
   {
+    using std::isnan;
+
     int i, j;
     double absa, sum, value;
     double ssq[2], colssq[2];
@@ -2026,6 +2059,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   void dtrmv( HalfOpt uplo, TransposeOpt trans, DiagIsUnitOpt diag, 
     int n, double *pA, int lda, double *x, int incx )
   {
+    using std::min;
+    using std::max;
+
     double tmp;
     int i, ix, j, jx, kx;
 
@@ -2210,6 +2246,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   void dtrmm( SideOpt side, HalfOpt uplo, TransposeOpt transa, DiagIsUnitOpt diag,
     int m, int n, double alpha, double *pA, int lda, double *pB, int ldb )
   {
+    using std::min;
+    using std::max;
+
     double tmp;
     int i, j, k, nrowa;
 
@@ -2864,6 +2903,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dlarft( DirectOpt direct, StoreOpt storev, int n, int k, double *pV, int ldv, double *tau, double *pT, int ldt )
   {
+    using std::min;
+    using std::max;
+
     int i, j, prevlastv, lastv;
 
     auto V = [&]( int i, int j ) noexcept -> double &
@@ -2995,6 +3037,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dsymv( HalfOpt uplo, int n, double alpha, double *pA, int lda, double *x, int incx, double beta, double *y, int incy )
   {
+    using std::min;
+    using std::max;
+
     double tmp1, tmp2;
     int i, ix, iy, j, jx, jy, kx, ky;
 
@@ -3158,6 +3203,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dsytd2( HalfOpt uplo, int n, double *pA, int lda, double *d, double *e, double *tau )
   {
+    using std::min;
+    using std::max;
+
     int i;
     double alpha, taui;
 
@@ -3251,6 +3299,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dorg2l( int m, int n, int k, double *pA, int lda, double *tau, double *work )
   {
+    using std::min;
+    using std::max;
+
     int i, ii, j, h;
 
     auto A = [&]( int i, int j ) noexcept -> double &
@@ -3297,6 +3348,9 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void dorg2r( int m, int n, int k, double *pA, int lda, double *tau, double *work )
   {
+    using std::min;
+    using std::max;
+
     int i, j, h;
 
     auto A = [&]( int i, int j ) noexcept -> double &
@@ -3415,8 +3469,6 @@ struct Toy_Cxx_LAPACK_3_7_0
   void dsterf( int n, double *d, double *e, int maxit )
   {
     // Mmmmm ...delicious goto sphagetti...
-    //
-    // This needed a couple of variable names changed to make it easier to read...
 
     int i, h, iscale, it, g, g1, gend, gendsv, hsv, nmaxit;
     double alpha, anorm, bb, c, eps, eps2, gamma, sigma, oldc, oldgam;
@@ -4075,6 +4127,8 @@ struct Toy_Cxx_LAPACK_3_7_0
 
   void TestSymmEigensolve()
   {
+    using std::isnan;
+
     double baseErrMax = 1.0e-10;
 
     auto CmpDbl = []( const void *pa, const void *pb ) noexcept -> int
