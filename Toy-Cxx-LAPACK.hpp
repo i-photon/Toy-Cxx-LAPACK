@@ -4361,4 +4361,4 @@ struct Toy_Cxx_LAPACK_3_7_0
     DoTest( "16x16 Random Symmetric Matrix", 16, A_16x16 );
   }
 
-}; // struct Reference_LAPACK_3_7_0
+}; // struct Toy_Cxx_LAPACK_3_7_0
