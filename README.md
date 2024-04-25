@@ -1,3 +1,6 @@
+# License
+The contents of this repository are hereby placed in the public domain.
+
 # Toy-Cxx-LAPACK
 Assorted C++-ified LAPACK routines for reference.
 
