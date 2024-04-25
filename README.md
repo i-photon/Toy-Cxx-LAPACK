@@ -11,7 +11,7 @@ Requires at least -std=c++20.
 Refer to the original FORTRAN routines for documentation.
 Plaintext link: https://netlib.org/lapack/explore-html/
 
-* Thse are complete translations from FORTRAN to C++ with index-space refactoring from Reference-LAPACK.
+* These are complete translations from FORTRAN to C++ with index-space refactoring from Reference-LAPACK.
 
 * There are _NO_ dependencies outside what little of the standard library was used.
 * It follows that this does _NOT_ depend on actual LAPACK of any version.
