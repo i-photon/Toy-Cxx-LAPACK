@@ -29,7 +29,7 @@ using std::isnan;
 //
 // The only guarantee here is that everything is 0-based, and should be
 // easier to follow if writing -something new- for a different value type or
-// something generic around the same algorithms.
+// template code.
 struct Toy_Cxx_LAPACK_3_7_0
 {
   struct XerblaException
