@@ -4,6 +4,7 @@ Assorted C++-ified LAPACK routines for reference.
 Currently just enough to obtain the eigensystem for a symmetric real matrix.
 
 Translations from FORTRAN to C++ with index-space refactoring from Reference-LAPACK.
+
 Requires at least -std=c++20.
  
 Refer to the original FORTRAN routines for documentation.
