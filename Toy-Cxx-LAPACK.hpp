@@ -1,5 +1,5 @@
 /*
-* This code, as the original FORTRAN, is in the public domain.
+* This code is in the public domain.
 * 
 * Author: Christopher Gary
 * 
