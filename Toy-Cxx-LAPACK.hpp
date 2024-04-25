@@ -27,7 +27,7 @@ using std::isnan;
 // This is intended for reference purposes only; not meant for production code.
 //
 // The only guarantee here is that everything is 0-based, and should be
-// easier to follow if building -something new- for a different value type or
+// easier to follow if writing -something new- for a different value type or
 // something generic around the same algorithms.
 struct Toy_Cxx_LAPACK_3_7_0
 {
