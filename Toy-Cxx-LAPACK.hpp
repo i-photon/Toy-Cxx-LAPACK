@@ -159,6 +159,11 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dcombssq
   //------------------------------------------------------------------------
 
+  // DCOMBSSQ adds two scaled sum of squares quantities, V1 := V1 + V2.
+  // That is,
+  //
+  //    V1_scale**2 * V1_sumsq := V1_scale**2 * V1_sumsq
+  //                            + V2_scale**2 * V2_sumsq
   void dcombssq( double v1[2], double v2[2] )
   {
     if( v1[0] >= v2[0] )
@@ -178,6 +183,19 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlassq
   //------------------------------------------------------------------------
 
+  // DLASSQ  returns the values  scl  and  smsq  such that
+  //
+  //    ( scl**2 )*smsq = x( 1 )^2 +...+ x( n )^2 + ( scale^2 )*sumsq,
+  //
+  // where  x( i ) = X( 1 + ( i - 1 )*INCX ). The value of  sumsq  is
+  // assumed to be non-negative and  scl  returns the value
+  //
+  //    scl = max( scale, abs( x( i ) ) ).
+  //
+  // scale and sumsq must be supplied in SCALE and SUMSQ and
+  // scl and smsq are overwritten on SCALE and SUMSQ respectively.
+  //
+  // The routine makes only one pass through the vector x.
   void dlassq( int n, double *x, int incx, double &scale, double &sumsq )
   {
     using std::isnan;
@@ -210,6 +228,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // daxpy
   //------------------------------------------------------------------------
 
+  // dy := dy + da*dx
   void daxpy( int n, double da, double *dx, int incx, double *dy, int incy )
   {
     int i, ix, iy;
@@ -241,6 +260,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // ddot
   //------------------------------------------------------------------------
 
+  // Garden-variety dot product.
   double ddot( int n, double *dx, int incx, double *dy, int incy )
   {
     double dtmp;
@@ -291,12 +311,13 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlae2
   //------------------------------------------------------------------------
 
+  // Eigenvalues of
+  //
+  // [ a b ]
+  // [ b c ]
   void dlae2( double a, double b, double c, double &rt1, double &rt2 )
   {
     double ab, acmn, acmx, adf, df, rt, sm, tb;
-
-    // Compute the eigenvalues of [ a b ]
-    //                            [ b c ]
 
     sm = a + c;
     df = a - c;
@@ -352,6 +373,10 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlaev2
   //------------------------------------------------------------------------
 
+  // Eigenvalues and eigenvector of:
+  //
+  // [ a b ]
+  // [ b c ]
   void dlaev2( double a, double b, double c, double &rt1, double &rt2, double &cs1, double &sn1 )
   {
     int sgn1, sgn2;
@@ -458,6 +483,20 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlartg
   //------------------------------------------------------------------------
 
+  // DLARTG generate a plane rotation so that
+  //
+  //    [  CS  SN  ]  .  [ F ]  =  [ R ]   where CS^2 + SN^2 = 1.
+  //    [ -SN  CS  ]     [ G ]     [ 0 ]
+  //
+  // This is a slower, more accurate version of the BLAS1 routine DROTG,
+  // with the following other differences:
+  //    F and G are unchanged on return.
+  //    If G=0, then CS=1 and SN=0.
+  //    If F=0 and (G .ne. 0), then CS=0 and SN=1 without doing any
+  //       floating point operations (saves work in DBDSQR when
+  //       there are zeros on the diagonal).
+  //
+  // If F exceeds G in magnitude, CS will be positive.
   void dlartg( double f, double g, double &cs, double &sn, double &r )
   {
     using std::min;
@@ -544,6 +583,8 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlaset
   //------------------------------------------------------------------------
 
+  // DLASET initializes an m-by-n matrix A to BETA on the diagonal and
+  // ALPHA on the offdiagonals.
   void dlaset( HalfOpt uplo, int m, int n, double alpha, double beta, double *pA, int lda )
   {
     using std::min;
@@ -587,6 +628,77 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlasr
   //------------------------------------------------------------------------
 
+  // DLASR applies a sequence of plane rotations to a real matrix A,
+  // from either the left or the right.
+  //
+  // When SIDE = 'L', the transformation takes the form
+  //
+  //    A := P*A
+  //
+  // and when SIDE = 'R', the transformation takes the form
+  //
+  //    A := A*(~P)
+  //
+  // where P is an orthogonal matrix consisting of a sequence of z plane
+  // rotations, with z = M when SIDE = 'L' and z = N when SIDE = 'R',
+  // and P**T is the transpose of P.
+  //
+  // When DIRECT = 'F' (Forward sequence), then
+  //
+  //    P = P(z-1) * ... * P(2) * P(1)
+  //
+  // and when DIRECT = 'B' (Backward sequence), then
+  //
+  //    P = P(1) * P(2) * ... * P(z-1)
+  //
+  // where P(k) is a plane rotation matrix defined by the 2-by-2 rotation
+  //
+  //    R(k) = [  c(k)  s(k) ]
+  //         = [ -s(k)  c(k) ].
+  //
+  // When PIVOT = 'V' (Variable pivot), the rotation is performed
+  // for the plane (k,k+1), i.e., P(k) has the form
+  //
+  //    P(k) = [  1                                            ]
+  //           [       ...                                     ]
+  //           [              1                                ]
+  //           [                   c(k)  s(k)                  ]
+  //           [                  -s(k)  c(k)                  ]
+  //           [                                1              ]
+  //           [                                     ...       ]
+  //           [                                            1  ]
+  //
+  // where R(k) appears as a rank-2 modification to the identity matrix in
+  // rows and columns k and k+1.
+  //
+  // When PIVOT = 'T' (Top pivot), the rotation is performed for the
+  // plane (1,k+1), so P(k) has the form
+  //
+  //    P(k) = [  c(k)                    s(k)                 ]
+  //           [         1                                     ]
+  //           [              ...                              ]
+  //           [                     1                         ]
+  //           [ -s(k)                    c(k)                 ]
+  //           [                                 1             ]
+  //           [                                      ...      ]
+  //           [                                             1 ]
+  //
+  // where R(k) appears in rows and columns 1 and k+1.
+  //
+  // Similarly, when PIVOT = 'B' (Bottom pivot), the rotation is
+  // performed for the plane (k,z), giving P(k) the form
+  //
+  //    P(k) = [ 1                                             ]
+  //           [     ...                                       ]
+  //           [             1                                 ]
+  //           [                  c(k)                    s(k) ]
+  //           [                         1                     ]
+  //           [                              ...              ]
+  //           [                                     1         ]
+  //           [                 -s(k)                    c(k) ]
+  //
+  // where R(k) appears in rows and columns k and z.  The rotations are
+  // performed without ever forming P(k) explicitly.
   void dlasr( SideOpt side, PivotOpt pivot, DirectOpt direct, int m, int n, double *c, double *s, double *pA, int lda )
   {
     using std::min;
@@ -864,6 +976,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlasrt
   //------------------------------------------------------------------------
 
+  // Trivial standard sort warpper.
   void dlasrt( SortDirectOpt id, int n, double *d )
   {
     if( n < 0 ){ throw XerblaException{ "dlasrt", 2 }; }
@@ -898,6 +1011,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // iladlc
   //------------------------------------------------------------------------
 
+  // Index of last non-zero column.
   int iladlc( int m, int n, double *pA, int lda )
   {
     int i, j;
@@ -928,6 +1042,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // iladlr
   //------------------------------------------------------------------------
 
+  // Index of last non-zero row.
   int iladlr( int m, int n, double *pA, int lda )
   {
     using std::min;
@@ -961,6 +1076,11 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlascl
   //------------------------------------------------------------------------
 
+  // DLASCL multiplies the M by N real matrix A by the real scalar
+  // CTO/CFROM.  This is done without over/underflow as long as the final
+  // result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that
+  // A may be full, upper triangular, lower triangular, upper Hessenberg,
+  // or banded.
   void dlascl( TypeOpt type, int kl, int ku, double cfrom, double cto, int m, int n, double *pA, int lda )
   {
     using std::min;
@@ -1128,6 +1248,12 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsyr2
   //------------------------------------------------------------------------
 
+  // DSYR2  performs the symmetric rank 2 operation
+  //
+  //    A := alpha*x*(~y) + alpha*y*(~x) + A,
+  //
+  // where alpha is a scalar, x and y are n element vectors and A is an n
+  // by n symmetric matrix.
   void dsyr2( HalfOpt uplo, int n, double alpha, double *x, int incx, double *y, int incy, double *pA, int lda )
   {
     using std::min;
@@ -1254,6 +1380,17 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsyr2k
   //------------------------------------------------------------------------
 
+  // DSYR2K  performs one of the symmetric rank 2k operations
+  //
+  //    C := alpha*A*(~B) + alpha*B*(~A) + beta*C,
+  //
+  // or
+  //
+  //    C := alpha*(~A)*B + alpha*(~B)*A + beta*C,
+  //
+  // where  alpha and beta  are scalars, C is an  n by n  symmetric matrix
+  // and  A and B  are  n by k  matrices  in the  first  case  and  k by n
+  // matrices in the second case.
   void dsyr2k( HalfOpt uplo, TransposeOpt trans, int n, int k, double alpha, double *pA, int lda, double *pB, int ldb, double beta, double *pC, int ldc )
   {
     using std::min;
@@ -1420,6 +1557,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dnrm2
   //------------------------------------------------------------------------
 
+  // Numerically stable 2-norm of a vector.
   double dnrm2( int n, double *x, int incx )
   {
     double absxi, norm, scale, ssq;
@@ -1468,6 +1606,12 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dger
   //------------------------------------------------------------------------
 
+  // DGER   performs the rank 1 operation
+  //
+  //    A := alpha*x*(~y) + A,
+  //
+  // where alpha is a scalar, x is an m element vector, y is an n element
+  // vector and A is an m by n matrix.
   void dger( int m, int n, double alpha, double *x, int incx, double *y, int incy, double *pA, int lda )
   {
     using std::min;
@@ -1533,6 +1677,12 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dgemv
   //------------------------------------------------------------------------
 
+  // DGEMV  performs one of the matrix-vector operations
+  //
+  //    y := alpha*A*x + beta*y,   or   y := alpha*(~A)*x + beta*y,
+  //
+  // where alpha and beta are scalars, x and y are vectors and A is an
+  // m by n matrix.
   void dgemv( TransposeOpt trans, int m, int n, double alpha, double *pA, int lda, double *x, int incx, double beta, double *y, int incy )
   {  
     using std::min;
@@ -1689,6 +1839,16 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dgemm
   //------------------------------------------------------------------------
 
+  // DGEMM  performs one of the matrix-matrix operations
+  //
+  //    C := alpha*op( A )*op( B ) + beta*C,
+  //
+  // where  op( X ) is one of
+  //
+  //    op( X ) = X   or   op( X ) = (~X),
+  //
+  // alpha and beta are scalars, and A, B and C are matrices, with op( A )
+  // an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.
   void dgemm( TransposeOpt transa, TransposeOpt transb, int m, int n, int k,
     double alpha, double *pA, int lda, double *pB, int ldb, double beta, double *pC, int ldc )
   {
@@ -1854,6 +2014,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlasnst
   //------------------------------------------------------------------------
 
+  // DLANST  returns the value of the one norm,  or the Frobenius norm, or
+  // the  infinity norm,  or the  element of  largest absolute value  of a
+  // real symmetric tridiagonal matrix A.
   double dlanst( NormOpt norm, int n, double *d, double *e )
   {
     using std::isnan;
@@ -1920,6 +2083,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlasnsy
   //------------------------------------------------------------------------
 
+  // DLANSY  returns the value of the one norm,  or the Frobenius norm, or
+  // the  infinity norm,  or the  element of  largest absolute value  of a
+  // real symmetric matrix A.
   double dlansy( NormOpt norm, HalfOpt uplo, int n, double *pA, int lda, double *work )
   {
     using std::isnan;
@@ -2056,6 +2222,12 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dtrmv
   //------------------------------------------------------------------------
 
+  // DTRMV  performs one of the matrix-vector operations
+  //
+  //    x := A*x,   or   x := (~A)*x,
+  //
+  // where x is an n element vector and  A is an n by n unit, or non-unit,
+  // upper or lower triangular matrix.
   void dtrmv( HalfOpt uplo, TransposeOpt trans, DiagIsUnitOpt diag, 
     int n, double *pA, int lda, double *x, int incx )
   {
@@ -2238,11 +2410,18 @@ struct Toy_Cxx_LAPACK_3_7_0
     }
   }
 
-
   //------------------------------------------------------------------------
   // dtrmm
   //------------------------------------------------------------------------
 
+  // DTRMM  performs one of the matrix-matrix operations
+  //
+  //    B := alpha*op( A )*B,   or   B := alpha*B*op( A ),
+  //
+  // where  alpha  is a scalar,  B  is an m by n matrix,  A  is a unit, or
+  // non-unit,  upper or lower triangular matrix  and  op( A )  is one  of
+  //
+  //    op( A ) = A   or   op( A ) = A**T.
   void dtrmm( SideOpt side, HalfOpt uplo, TransposeOpt transa, DiagIsUnitOpt diag,
     int m, int n, double alpha, double *pA, int lda, double *pB, int ldb )
   {
@@ -2456,6 +2635,14 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlarf
   //------------------------------------------------------------------------
 
+  // DLARF applies a real elementary reflector H to a real m by n matrix
+  // C, from either the left or the right. H is represented in the form
+  //
+  //       H = I - tau * v * (~v)
+  //
+  // where tau is a real scalar and v is a real vector.
+  //
+  // If tau = 0, then H is taken to be the unit matrix.
   void dlarf( SideOpt side, int m, int n, double *v, int incv, double tau, double *pC, int ldc, double *work )
   {
     bool applyleft;
@@ -2514,6 +2701,8 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlarfb
   //------------------------------------------------------------------------
 
+  // DLARFB applies a real block reflector H or its transpose (~H) to a
+  // real m by n matrix C, from either the left or the right.
   void dlarfb( SideOpt side, TransposeOpt trans, DirectOpt direct, StoreOpt storev, int m, int n, int k,
     double *pV, int ldv, double *pT, int ldt, double *pC, int ldc, double *pWork, int ldwork )
   {
@@ -2842,6 +3031,25 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlarfg
   //------------------------------------------------------------------------
 
+  // DLARFG generates a real elementary reflector H of order n, such
+  // that
+  //
+  //       H * [ alpha ] = [ beta ],   (~H)*H = I.
+  //           [   x   ]   [   0  ]
+  //
+  // where alpha and beta are scalars, and x is an (n-1)-element real
+  // vector. H is represented in the form
+  //
+  //       H = I - tau * [ 1 ] * [ 1 ~v ]
+  //                     [ v ]
+  //
+  // where tau is a real scalar and v is a real (n-1)-element
+  // vector.
+  //
+  // If the elements of x are all zero, then tau = 0 and H is taken to be
+  // the unit matrix.
+  //
+  // Otherwise  1 <= tau <= 2.
   void dlarfg( int n, double &alpha, double *x, int incx, double &tau )
   {
     int j, knt;
@@ -2901,6 +3109,22 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dlarft
   //------------------------------------------------------------------------
 
+  // DLARFT forms the triangular factor T of a real block reflector H
+  // of order n, which is defined as a product of k elementary reflectors.
+  //
+  // If DIRECT = 'F', H = H(1) H(2) . . . H(k) and T is upper triangular;
+  //
+  // If DIRECT = 'B', H = H(k) . . . H(2) H(1) and T is lower triangular.
+  //
+  // If STOREV = 'C', the vector which defines the elementary reflector
+  // H(i) is stored in the i-th column of the array V, and
+  //
+  //    H  =  I - V * T * V**T
+  //
+  // If STOREV = 'R', the vector which defines the elementary reflector
+  // H(i) is stored in the i-th row of the array V, and
+  //
+  // H  =  I - V**T * T * V
   void dlarft( DirectOpt direct, StoreOpt storev, int n, int k, double *pV, int ldv, double *tau, double *pT, int ldt )
   {
     using std::min;
@@ -3035,6 +3259,9 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsymv
   //------------------------------------------------------------------------
 
+  // Performs the matrix-vector  operation
+  //
+  // y := alpha*A*x + beta*y,
   void dsymv( HalfOpt uplo, int n, double alpha, double *pA, int lda, double *x, int incx, double beta, double *y, int incy )
   {
     using std::min;
@@ -3201,6 +3428,8 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsytd2
   //------------------------------------------------------------------------
 
+  // Tridiagonalization of a real symmetric matrix A.
+  // Pass to dorgtr with the same uplo to construct the orthogonal matrix Q in: A = Q*T*(~Q).
   void dsytd2( HalfOpt uplo, int n, double *pA, int lda, double *d, double *e, double *tau )
   {
     using std::min;
@@ -3297,6 +3526,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dorg2l
   //------------------------------------------------------------------------
 
+  // Work must be at least n-1 in size
   void dorg2l( int m, int n, int k, double *pA, int lda, double *tau, double *work )
   {
     using std::min;
@@ -3346,6 +3576,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dorg2r
   //------------------------------------------------------------------------
 
+  // Work must be at least n-1 in size
   void dorg2r( int m, int n, int k, double *pA, int lda, double *tau, double *work )
   {
     using std::min;
@@ -3397,7 +3628,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dorgtr
   //------------------------------------------------------------------------
 
-  // work is must be at least n-1 in size
+  // Work must be at least n-1 in size
   void dorgtr( HalfOpt uplo, int n, double *pA, int lda, double *tau, double *work )
   {
     int i, j;
@@ -3455,7 +3686,7 @@ struct Toy_Cxx_LAPACK_3_7_0
       for( i = 1; i < n; ++i )
       { A(i,0) = 0.0; }
 
-      // Generate Q(1:n-1,1:n-1)
+      // Generate Q(0:n-2,0:n-2)
 
       dorg2r( n-1, n-1, n-1, &A(1,1), lda, tau, work );
     }
