@@ -27,7 +27,7 @@ using std::isnan;
 // This is intended for reference purposes only; not meant for production code.
 //
 // The only guarantee here is that everything is 0-based, and should be
-// easier to follow if building the same for a different value type or
+// easier to follow if building -something new- for a different value type or
 // something generic around the same algorithms.
 struct Toy_Cxx_LAPACK_3_7_0
 {
@@ -4214,7 +4214,7 @@ struct Toy_Cxx_LAPACK_3_7_0
       // Save Z for later.
       memcpy( pZ0, pZ, n*n*sizeof(double) );
 
-      // Note: Egenvalue ordering may be different between
+      // Note: Eigenvalue ordering may be different between
       // dsterf and dsteqr.
 
       // Set the diagonal along L to the eigenvalues.
