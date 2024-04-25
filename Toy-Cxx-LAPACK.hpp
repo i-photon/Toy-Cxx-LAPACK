@@ -3465,11 +3465,13 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsterf
   //------------------------------------------------------------------------
 
-  // Does NOT sort the eigenvalues
-  void dsterf( int n, double *d, double *e, int maxit )
+  // Returns false if the iteration count was exceeded.
+  // Does NOT sort the eigenvalues.
+  bool dsterf( int n, double *d, double *e, int maxit )
   {
     // Mmmmm ...delicious goto sphagetti...
 
+    bool converged = true;
     int i, h, iscale, it, g, g1, gend, gendsv, hsv, nmaxit;
     double alpha, anorm, bb, c, eps, eps2, gamma, sigma, oldc, oldgam;
     double p, r, rt1, rt2, rte, s, safmax, safmin, ssfmax, ssfmin;//, rmax;
@@ -3480,7 +3482,7 @@ struct Toy_Cxx_LAPACK_3_7_0
 
     // Quick return if possible
 
-    if( n <= 1 ){ return; }
+    if( n <= 1 ){ return true; }
 
     eps = DBL_EPSILON;
     eps2 = sqr(eps);
@@ -3756,21 +3758,24 @@ struct Toy_Cxx_LAPACK_3_7_0
 
     if( it < nmaxit ){ goto jmp_10__; }
 
+    converged = false;
     goto jmp_180_;
 
   jmp_170_:
   jmp_180_:
 
-    return;
+    return converged;
   }
 
   //------------------------------------------------------------------------
   // dsteqr
   //------------------------------------------------------------------------
 
+  // Returns false if the iteration count was exceeded.
   // Does NOT sort the eigensystem
-  void dsteqr( CompEigvOpt compz, int n, double *d, double *e, double *pZ, int ldz, double *work, int maxit )
+  bool dsteqr( CompEigvOpt compz, int n, double *d, double *e, double *pZ, int ldz, double *work, int maxit )
   {
+    bool converged = true;
     int i, iscale, jtot, l, l1, lend, lendm1, lendp1, lendsv, lm1, lsv, m, mm, mm1, nm1, nmaxit;
     double anorm, b, c, eps, eps2, f, g, p, r, rt1, rt2, s, safmax, safmin, ssfmax, ssfmin, tst;
 
@@ -3786,7 +3791,7 @@ struct Toy_Cxx_LAPACK_3_7_0
 
     // Quick return if possible
 
-    if( 0 == n ){ return; }
+    if( 0 == n ){ return true; }
 
     if( ( 1 == n ) && ( kTridEigv == compz ))
     { Z(0,0) = 1.0; }
@@ -4117,12 +4122,14 @@ struct Toy_Cxx_LAPACK_3_7_0
 
     if( jtot < nmaxit )
     { goto jmp_10__; }
+
+    converged = false;
     goto jmp_190_;
 
   jmp_160_:
   jmp_190_:
 
-    return;
+    return converged;
   }
 
   void TestSymmEigensolve()
@@ -4214,7 +4221,11 @@ struct Toy_Cxx_LAPACK_3_7_0
       memcpy( d0, d, n*sizeof(double) );
       memcpy( e0, e, (n-1)*sizeof(double) );
 
-      dsterf( n, d, e, 1024 );
+      if( ! dsterf( n, d, e, 1024 ) )
+      {
+        failed = true;
+        printf( "FAILED: dsterf failed to converge.\n" );
+      }
 
       if( ! isnan(d[n]) )
       {
@@ -4248,7 +4259,11 @@ struct Toy_Cxx_LAPACK_3_7_0
       if( failed )
       { return; }
 
-      dsteqr( kOrigEigv, n, d0, e0, pZ, n, work , 1024 );
+      if( ! dsteqr( kOrigEigv, n, d0, e0, pZ, n, work , 1024 ) )
+      {
+        failed = true;
+        printf( "FAILED: dsteqr failed to converge.\n" );
+      }
 
       if( ! isnan(d0[n]) )
       {
