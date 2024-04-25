@@ -2250,7 +2250,8 @@ struct Toy_Cxx_LAPACK_3_7_0
                 tmp = alpha*B(k,j);
                 for( i = 0; i <= k-1; ++i )
                 { B(i,j) += tmp*A(i,k); }
-                if( kDiagNotUnit == diag ){ tmp = tmp*A(k,k); }
+                if( kDiagNotUnit == diag )
+                { tmp = tmp*A(k,k); }
                 B(k,j) = tmp;
               }
             }
@@ -3415,7 +3416,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   {
     // Mmmmm ...delicious goto sphagetti...
     //
-    // This needed a couple of variable names chaned to make it easier to read...
+    // This needed a couple of variable names changed to make it easier to read...
 
     int i, h, iscale, it, g, g1, gend, gendsv, hsv, nmaxit;
     double alpha, anorm, bb, c, eps, eps2, gamma, sigma, oldc, oldgam;
