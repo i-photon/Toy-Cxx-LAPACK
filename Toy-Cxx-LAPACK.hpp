@@ -3609,12 +3609,12 @@ struct Toy_Cxx_LAPACK_3_7_0
     for( i = k-1; i >= 0; --i )
     {
       // Apply H(i) to A(i:m-1,i:n-1) from the left
-      if( i < n )
+      if( i < (n-1) )
       {
         A(i,i) = 1.0;
         dlarf( kLeft, m-(i+1)+1, n-(i+1), &A(i,i), 1, tau[i], &A(i,i+1), lda, work );
       }
-      if( i < m )
+      if( i < (m-1) )
       { dscal( m-(i+1), -tau[i], &A(i+1,i), 1 ); }
 
       A(i,i) = 1.0 - tau[i];
