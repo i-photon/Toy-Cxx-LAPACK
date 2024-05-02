@@ -51,7 +51,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   {
     kTrans = 'T',
     kNoTrans = 'N',
-    kCeeTrans_idk = 'C'
+    kConjTrans = 'C'
   };
 
   enum SideOpt : char
