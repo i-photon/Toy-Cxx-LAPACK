@@ -51,7 +51,7 @@ struct Toy_Cxx_LAPACK_3_7_0
   {
     kTrans = 'T',
     kNoTrans = 'N',
-    kConjTrans = 'C'
+    kCeeTrans_idk = 'C'
   };
 
   enum SideOpt : char
@@ -162,8 +162,8 @@ struct Toy_Cxx_LAPACK_3_7_0
   // DCOMBSSQ adds two scaled sum of squares quantities, V1 := V1 + V2.
   // That is,
   //
-  //    V1_scale**2 * V1_sumsq := V1_scale**2 * V1_sumsq
-  //                            + V2_scale**2 * V2_sumsq
+  //    V1_scale**2 * V1_sumsq := V1_scale^2 * V1_sumsq
+  //                            + V2_scale^2 * V2_sumsq
   void dcombssq( double v1[2], double v2[2] )
   {
     if( v1[0] >= v2[0] )
@@ -1030,6 +1030,11 @@ struct Toy_Cxx_LAPACK_3_7_0
     { for( i = 0; i < m; ++i )
     { if( 0.0 != A(i,j) ){ break; } } }
 
+    // NOTE: The original function did not initialize its return value,
+    // and would produce an uknown value if the matrix was all zeros.
+    //
+    // It is assumed all client code is using the function under
+    // the correct assumptions.
     return j;
   }
 
@@ -3385,7 +3390,7 @@ struct Toy_Cxx_LAPACK_3_7_0
           tmp1 = alpha*x[j];
           tmp2 = 0.0;
           y[j] += tmp1*A(j,j);
-          for( i = j; i < n; ++i )
+          for( i = j+1; i < n; ++i )
           {
             y[i] += tmp1*A(i,j);
             tmp2 += A(i,j)*x[i];
@@ -3489,7 +3494,7 @@ struct Toy_Cxx_LAPACK_3_7_0
         // Generate elementary reflector H(i) = I - tau*v*(~v)
         // to annihilate A(i+2:n-1,i)
 
-        dlarfg( n-(i+1), A(i+1,i), &A(min(i+2,n-1),i), 1, taui );
+        dlarfg( n-(i+1), A(i+1,i), &A( min(i+2,n-1), i ), 1, taui );
         e[i] = A(i+1,i);
 
         if( 0.0 != taui )
@@ -3514,6 +3519,7 @@ struct Toy_Cxx_LAPACK_3_7_0
         d[i] = A(i,i);
         tau[i] = taui;
       }
+      d[n-1] = A(n-1,n-1);
     }
   }
 
@@ -3675,7 +3681,7 @@ struct Toy_Cxx_LAPACK_3_7_0
       {
         A(0,j) = 0.0;
         for( i = j+1; i < n; ++i )
-        { A(i,j) = A(i,j+1); }
+        { A(i,j) = A(i,j-1); }
       }
       A(0,0) = 1.0;
       for( i = 1; i < n; ++i )
