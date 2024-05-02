@@ -1030,11 +1030,6 @@ struct Toy_Cxx_LAPACK_3_7_0
     { for( i = 0; i < m; ++i )
     { if( 0.0 != A(i,j) ){ break; } } }
 
-    // NOTE: The original function did not initialize its return value,
-    // and would produce an uknown value if the matrix was all zeros.
-    //
-    // It is assumed all client code is using the function under
-    // the correct assumptions.
     return j;
   }
 
