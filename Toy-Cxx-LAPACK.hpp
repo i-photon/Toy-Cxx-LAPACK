@@ -3808,7 +3808,7 @@ struct Toy_Cxx_LAPACK_3_7_0
       {
         for( h = g; h <= (gend-1); ++h )
         {
-          if( sqr(e[h]) <= ( eps2*fabs(d[h]*d[h+1]) + safmin ) )
+          if( fabs(e[h]) <= ( eps2*fabs(d[h]*d[h+1]) + safmin ) )
           { goto jmp_70__; }
         }
       }
