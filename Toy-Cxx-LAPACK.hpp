@@ -3697,12 +3697,13 @@ struct Toy_Cxx_LAPACK_3_7_0
   // dsterf
   //------------------------------------------------------------------------
 
+  // Prefer using dsteqr instead.
+  // This routine tends to be inaccurate.
+  //
   // Returns false if the iteration count was exceeded.
   // Does NOT sort the eigenvalues.
   bool dsterf( int n, double *d, double *e, int maxit )
   {
-    // Mmmmm ...delicious goto sphagetti...
-
     bool converged = true;
     int i, h, iscale, it, g, g1, gend, gendsv, hsv, nmaxit;
     double alpha, anorm, bb, c, eps, eps2, gamma, sigma, oldc, oldgam;
